@@ -891,7 +891,7 @@ addEventListener("keydown", function(e){
   if (e.key === "e" || e.key === "E"){ sentar(); empuja(true); return; }
   if (e.key === "p" || e.key === "P"){ if (!soyProfe) abrePapel(); e.preventDefault(); return; }
   if (e.key === "r" || e.key === "R"){
-    if (soyProfe){ var oc2 = alumnoCerca(); if (oc2 && oc2.dk) abreRev(oc2.dk); else cierraRev(); }
+    if (soyProfe) abreRevision();
     e.preventDefault(); return;
   }
   if (e.key >= "1" && e.key <= "6"){ reacciona(parseInt(e.key, 10) - 1); return; }
@@ -1092,7 +1092,6 @@ function entra(){
   document.getElementById("bAC").hidden = !soyProfe;
   document.getElementById("bPapel").hidden = soyProfe;
   document.getElementById("bRevisar").hidden = !soyProfe;
-  document.getElementById("bRevisar").disabled = true;
 
   dentro = true;
   document.getElementById("capaJoin").style.display = "none";
@@ -1348,7 +1347,7 @@ function alumnoCerca(){
     if (o.sent >= 0) dd *= .55;
     if (dd < dm){ dm = dd; mejor = o; }
   }
-  return dm < 700 ? mejor : null;
+  return dm < 1600 ? mejor : null;
 }
 
 function nombreDe(docid){
@@ -1518,22 +1517,27 @@ revN.addEventListener("keydown", function(e){
 });
 
 document.getElementById("bPapel").addEventListener("click", abrePapel);
-document.getElementById("bRevisar").addEventListener("click", function(){
-  var o = alumnoCerca();
+function primerAlumno(){
+  for (var i = 0; i < otros.length; i++)
+    if (!otros[i].pf && otros[i].dk) return otros[i];
+  return null;
+}
+function abreRevision(){
+  if (!dockR.hidden){ cierraRev(); return; }
+  var o = alumnoCerca() || primerAlumno();
   if (o && o.dk) abreRev(o.dk);
-  else if (!dockR.hidden) cierraRev();
-});
+  else document.getElementById("estado").innerHTML = "<b>no hay alumnos todavía</b>";
+}
+document.getElementById("bRevisar").addEventListener("click", abreRevision);
 
 /* el botón de revisar se prende solo cuando hay alguien al lado */
 setInterval(function(){
   if (!soyProfe || !dentro) return;
   var o = alumnoCerca(), b = document.getElementById("bRevisar");
   if (o){
-    b.disabled = false;
     b.classList.add("cerca");
     b.textContent = "Revisar a " + o.nick.slice(0, 10) + " · R";
   } else {
-    b.disabled = dockR.hidden;
     b.classList.remove("cerca");
     b.textContent = "Revisar · R";
   }
