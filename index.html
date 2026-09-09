@@ -272,6 +272,9 @@ mark.mk2{background:rgba(47,169,140,.34);box-shadow:0 -2px 0 var(--chalk) inset}
     <button class="b" id="bRevClose" type="button">Cerrar · Esc</button>
   </div>
   <div class="dock-b">
+    <button class="b" id="bFinClase" type="button">Terminar la clase y borrar todo</button>
+  </div>
+  <div class="dock-b">
     <span class="nota" id="notaRev" style="margin:0"></span>
   </div>
 </div>
@@ -1512,6 +1515,34 @@ document.getElementById("bMkClear").addEventListener("click", function(){
   publicaMarcas(revActivo); pintaRev(true);
 });
 document.getElementById("bRevClose").addEventListener("click", cierraRev);
+
+/* Las hojas se quedan guardadas en el servidor para que aguanten una recarga.
+   Al acabar la clase conviene bajarlas: son trabajos de menores en un servidor
+   publico y gratuito. */
+document.getElementById("bFinClase").addEventListener("click", function(){
+  var ids = Object.create(null), n = 0;
+  for (var k in docs) { ids[k] = 1; }
+  for (var i = 0; i < otros.length; i++)
+    if (!otros[i].pf && otros[i].dk) ids[otros[i].dk] = 1;
+  for (var z in ids) n++;
+  if (!n){ document.getElementById("notaRev").textContent = "No hay nada guardado."; return; }
+  if (!confirm("Se van a borrar " + n + " hoja(s) y todas sus marcas, para todos. " +
+               "Esto no se puede deshacer. ¿Le sigo?")) return;
+  for (var id in ids){
+    try {
+      cli.publish(RAIZ + "/doc/" + id, "", {qos:0, retain:true});
+      cli.publish(RAIZ + "/mk/"  + id, "", {qos:0, retain:true});
+    } catch(e){}
+    delete docs[id];
+    delete marcasDe[id];
+    delete marcasDe[id + "@nota"];
+    miUltimaMarca[id] = Date.now();
+  }
+  revN.value = "";
+  firmaRev = "";
+  document.getElementById("notaRev").textContent = "Listo: se borraron " + n + " hoja(s).";
+  if (revActivo) pintaRev(true);
+});
 var relojN = 0, colaN = false;
 function mandaNota(){
   if (!revActivo) return;
