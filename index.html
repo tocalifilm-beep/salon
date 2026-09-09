@@ -91,6 +91,57 @@ details{margin-top:14px}
 summary{font-family:var(--px);font-size:8px;color:var(--ink-3);cursor:pointer;
   letter-spacing:.06em}
 hr{border:0;border-top:2px solid var(--line);margin:20px 0}
+
+/* ===== papel del alumno y revisión del maestro ===== */
+.b.alerta{background:var(--mal);border-color:var(--mal);color:#1A0C0A}
+.b.cerca{border-color:var(--warm);color:var(--ink)}
+#dockPapel,#dockRev{position:fixed;left:12px;bottom:66px;z-index:16;
+  width:min(440px,calc(100vw - 24px));
+  background:var(--panel);border:2px solid var(--line);border-radius:4px;padding:12px;
+  box-shadow:0 18px 44px -16px #000}
+#dockRev{left:auto;right:12px;border-color:var(--warm)}
+#dockPapel .dock-t,#dockRev .dock-t{font-family:var(--px);font-size:8px;letter-spacing:.06em;
+  color:var(--ink-3);margin-bottom:8px;line-height:1.6}
+#dockPapel .dock-b,#dockRev .dock-b{display:flex;gap:6px;align-items:center;
+  margin-top:10px;flex-wrap:wrap}
+.papel-caja{position:relative}
+.papel-cap{font-family:ui-monospace,Menlo,monospace;font-size:14px;line-height:1.55;
+  padding:10px 12px;border:2px solid var(--line);border-radius:3px;
+  white-space:pre-wrap;word-wrap:break-word;overflow-wrap:break-word;
+  min-height:150px;max-height:34vh;overflow-y:auto;box-sizing:border-box;
+  width:100%;margin:0;letter-spacing:normal;tab-size:2}
+#papelBack{position:absolute;inset:0;background:var(--panel-2);color:transparent;
+  pointer-events:none;z-index:0;border-color:var(--line)}
+#taPapel{position:relative;z-index:1;background:transparent;color:var(--ink);
+  resize:none;display:block;caret-color:var(--chalk)}
+#taPapel:focus{outline:none;border-color:var(--chalk)}
+#papelBack mark{color:transparent}
+#revTexto{background:var(--panel-2);color:var(--ink);user-select:text;cursor:text}
+#revTexto.vacio{color:var(--ink-3);font-style:italic}
+mark{background:none;padding:1px 0;border-radius:2px}
+mark.mk0{background:rgba(199,69,60,.40);box-shadow:0 -2px 0 var(--mal) inset}
+mark.mk1{background:rgba(224,135,60,.38);box-shadow:0 -2px 0 var(--warm) inset}
+mark.mk2{background:rgba(47,169,140,.34);box-shadow:0 -2px 0 var(--chalk) inset}
+.b.mk0[aria-pressed=true]{border-color:var(--mal);color:var(--ink)}
+.b.mk1[aria-pressed=true]{border-color:var(--warm);color:var(--ink)}
+.b.mk2[aria-pressed=true]{border-color:var(--chalk);color:var(--ink)}
+.aviso-prof{margin-top:9px;padding:9px 11px;border-radius:3px;font-size:13px;
+  line-height:1.5;background:var(--panel-2);border-left:3px solid var(--warm);
+  color:var(--ink-2)}
+.aviso-prof b{color:var(--ink);font-weight:600}
+.leyenda{font-size:11.5px;color:var(--ink-3);margin-top:8px;line-height:1.6}
+.leyenda i{font-style:normal;padding:1px 5px;border-radius:2px;margin-right:2px}
+.leyenda .l0{background:rgba(199,69,60,.40)}
+.leyenda .l1{background:rgba(224,135,60,.38)}
+.leyenda .l2{background:rgba(47,169,140,.34)}
+#revNota{margin-top:9px;font-size:14px}
+#dockRev .lista-al{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:9px}
+#dockRev .lista-al button{font-family:var(--px);font-size:8px;padding:6px 8px;
+  background:var(--panel-2);border:2px solid var(--line);border-radius:3px;
+  color:var(--ink-2);cursor:pointer}
+#dockRev .lista-al button:hover{border-color:var(--warm);color:var(--ink)}
+#dockRev .lista-al button[aria-pressed=true]{border-color:var(--warm);
+  background:var(--warm);color:#1E1006}
 @media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
 </style>
 </head>
@@ -102,6 +153,8 @@ hr{border:0;border-top:2px solid var(--line);margin:20px 0}
   <input id="say" type="text" maxlength="90" placeholder="Enter para hablar · Esc para volver a caminar" autocomplete="off">
   <span id="reacs"></span>
   <button class="b" id="bSit" type="button">Sentarse · E</button>
+  <button class="b" id="bPapel" type="button" hidden>Mi papel · P</button>
+  <button class="b" id="bRevisar" type="button" hidden>Revisar · R</button>
   <button class="b" id="bBoardI" type="button" hidden>Pizarrón izq</button>
   <button class="b" id="bBoardD" type="button" hidden>Pizarrón der</button>
   <button class="b" id="bAC" type="button" hidden>Aire</button>
@@ -115,6 +168,10 @@ hr{border:0;border-top:2px solid var(--line);margin:20px 0}
     <p>No hace falta cuenta de nada. Todos los que escriban el <b>mismo salón</b> y la
     <b>misma contraseña</b> caen en el mismo cuarto. Se camina con flechas o WASD, se habla
     escribiendo abajo, y con <b>E</b> te sientas en la banca más cercana. Los botones de abajo —o las teclas <b>1</b> a <b>6</b>— sacan una reacción arriba de tu cabeza.</p>
+
+    <p>En tu banca tienes un <b>papel</b> para escribir tu trabajo: se abre con la tecla
+    <b>P</b>. Cuando el maestro se para junto a ti puede leerlo y subrayarte lo que hay
+    que corregir; a ti te aparece marcado en tu propio papel.</p>
 
     <div class="mitad">
       <div>
@@ -150,7 +207,8 @@ hr{border:0;border-top:2px solid var(--line);margin:20px 0}
       <label for="mkey">Clave de maestro</label>
       <input id="mkey" type="text" maxlength="32" placeholder="la clave del maestro" autocomplete="off">
       <p class="nota">La clave ya está puesta en el archivo. Con ella puedes escribir en el
-      pizarrón y prender el aire, y tu monito sale de saco. No la repartas: los
+      pizarrón, prender el aire y <b>revisar el papel de los alumnos</b>: camina hasta la
+      banca de uno y aprieta <b>R</b>. Tu monito sale de saco. No la repartas: los
       alumnos sólo necesitan el salón y la contraseña.</p>
       <label for="srv">Servidor (déjalo así si funciona)</label>
       <input id="srv" type="text" placeholder="automático" autocomplete="off">
@@ -401,6 +459,16 @@ function globo(cx, cy, s){
 }
 
 /* ===================== pintar ===================== */
+/* la hoja de trabajo sobre la banca; el punto rojo quiere decir que el maestro
+   ya le marco algo y el alumno todavia no la abre */
+function papelEnBanca(d, avisa){
+  rect(d.x + 18, d.y + 1, 7, 5, "#F7F6F1");
+  rect(d.x + 18, d.y + 1, 7, 1, "#FFFFFF");
+  rect(d.x + 19, d.y + 3, 5, 1, "#BFB9AC");
+  rect(d.x + 19, d.y + 5, 4, 1, "#BFB9AC");
+  if (avisa) rect(d.x + 23, d.y, 3, 3, "#C7453C");
+}
+
 function ladoBoard(txt, x0){
   if (!txt) return;
   ctx.setTransform(1,0,0,1,0,0);
@@ -456,7 +524,8 @@ function pinta(){
 
   var todos = otros.slice();
   if (dentro) todos.push({me:true, a:yo, nick: yo.nick || "tú", x:yo.x, y:yo.y,
-                          sent:yo.sent, say:yo.say, re:yo.re, pf:soyProfe});
+                          sent:yo.sent, say:yo.say, re:yo.re, pf:soyProfe,
+                          dk: DOCID, dl: miDoc.length ? 1 : 0, dm: marcasNuevas ? 1 : 0});
   todos.sort(function(A, B){ return A.y - B.y; });
 
   for (var i = 0; i < todos.length; i++){
@@ -487,13 +556,15 @@ function pinta(){
   for (var t2 = 0; t2 < todos.length; t2++){
     var oc = todos[t2].sent;
     if (oc < 0 || !BANCAS[oc]) continue;
-    var db2 = BANCAS[oc];
+    var db2 = BANCAS[oc], qq = todos[t2], hoja = !!qq.dl;
     rect(db2.x, db2.y, 26, 7, "#A9743F");
     rect(db2.x, db2.y, 26, 2, "#C08A50");
     rect(db2.x + 2, db2.y + 7, 4, 3, "#7A5227");
     rect(db2.x + 20, db2.y + 7, 4, 3, "#7A5227");
-    texto(db2.x + 13, db2.y + 6, (todos[t2].pf ? "\u2605 " : "") + (todos[t2].nick || "\u2026").slice(0, 14),
-          todos[t2].me ? "#BEF0E1" : "#F1E4D2", Math.max(8, 2.1 * ESC), true);
+    if (hoja) papelEnBanca(db2, qq.dm);
+    texto(db2.x + (hoja ? 10 : 13), db2.y + 6,
+          (qq.pf ? "\u2605 " : "") + (qq.nick || "\u2026").slice(0, 14),
+          qq.me ? "#BEF0E1" : "#F1E4D2", Math.max(8, 2.1 * ESC), true);
   }
 
   if (mundo.ac){
@@ -644,7 +715,12 @@ function conecta(cb){
       if (listo) return;
       listo = true; sirvio = true; clearTimeout(reloj);
       cli = c; conectado = true;
-      c.subscribe([RAIZ + "/p/+", RAIZ + "/bye", RAIZ + "/mundo"], {qos: 0});
+      var temas = [RAIZ + "/p/+", RAIZ + "/bye", RAIZ + "/mundo"];
+      /* el maestro ve todas las hojas; el alumno nada mas recibe sus propias marcas */
+      if (soyProfe) temas.push(RAIZ + "/doc/+", RAIZ + "/mk/+");
+      else temas.push(RAIZ + "/mk/" + DOCID);
+      c.subscribe(temas, {qos: 0});
+      if (miDoc) setTimeout(publicaDoc, 400);
       nota("<b>Conectado.</b> Salón <b>" + norm(cfg.sala) + "</b>.");
       cb(true);
     });
@@ -679,6 +755,8 @@ function recibe(topic, buf){
     document.getElementById("bAC").classList.toggle("on", mundo.ac);
     return;
   }
+  if (topic.indexOf(RAIZ + "/doc/") === 0){ llegaDoc(topic.slice((RAIZ + "/doc/").length), txt); return; }
+  if (topic.indexOf(RAIZ + "/mk/")  === 0){ llegaMarcas(topic.slice((RAIZ + "/mk/").length), txt); return; }
   if (topic.indexOf(RAIZ + "/p/") !== 0) return;
   var id = topic.slice((RAIZ + "/p/").length);
   if (id === YOID) return;
@@ -692,6 +770,9 @@ function recibe(topic, buf){
     x: d.x, y: d.y,
     sent: typeof d.s === "number" ? d.s : -1,
     pf: !!d.f,
+    dk: typeof d.dk === "string" ? d.dk.slice(0, 12) : "",
+    dl: d.dl ? 1 : 0,
+    dm: d.dm ? 1 : 0,
     say: (d.say && typeof d.say.t === "string") ? {t: d.say.t.slice(0, 90), at: Date.now() - (d.say.d || 0)} : null,
     re: (d.re && typeof d.re.k === "number" && ICONOS[d.re.k])
         ? {k: d.re.k, at: Date.now() - (d.re.d || 0)} : null,
@@ -726,7 +807,8 @@ function empuja(force){
   ultimo = ahora;
   var d = {n: yo.nick.slice(0,14), p:yo.p, h:yo.h, r:yo.r, c:yo.c, g:yo.g,
            x: Math.round(yo.x*10)/10, y: Math.round(yo.y*10)/10,
-           s: yo.sent, f: soyProfe ? 1 : 0};
+           s: yo.sent, f: soyProfe ? 1 : 0,
+           dk: DOCID, dl: miDoc.length ? 1 : 0, dm: marcasNuevas ? 1 : 0};
   if (yo.say && ahora - yo.say.at < 7000) d.say = {t: yo.say.t, d: ahora - yo.say.at};
   if (yo.re && ahora - yo.re.at < 2600) d.re = {k: yo.re.k, d: ahora - yo.re.at};
   try { cli.publish(RAIZ + "/p/" + YOID, JSON.stringify(d), {qos:0, retain:false}); } catch(e){}
@@ -763,6 +845,11 @@ addEventListener("keydown", function(e){
   }
   if (e.key === "Enter"){ inSay.focus(); e.preventDefault(); return; }
   if (e.key === "e" || e.key === "E"){ sentar(); empuja(true); return; }
+  if (e.key === "p" || e.key === "P"){ if (!soyProfe) abrePapel(); e.preventDefault(); return; }
+  if (e.key === "r" || e.key === "R"){
+    if (soyProfe){ var oc2 = alumnoCerca(); if (oc2 && oc2.dk) abreRev(oc2.dk); else cierraRev(); }
+    e.preventDefault(); return;
+  }
   if (e.key >= "1" && e.key <= "6"){ reacciona(parseInt(e.key, 10) - 1); return; }
   teclas[e.key] = true;
   if (["ArrowUp","ArrowDown","ArrowLeft","ArrowRight"," "].indexOf(e.key) >= 0) e.preventDefault();
@@ -959,6 +1046,9 @@ function entra(){
   document.getElementById("bBoardI").hidden = !soyProfe;
   document.getElementById("bBoardD").hidden = !soyProfe;
   document.getElementById("bAC").hidden = !soyProfe;
+  document.getElementById("bPapel").hidden = soyProfe;
+  document.getElementById("bRevisar").hidden = !soyProfe;
+  document.getElementById("bRevisar").disabled = true;
 
   dentro = true;
   document.getElementById("capaJoin").style.display = "none";
@@ -977,9 +1067,480 @@ document.getElementById("bEntrar").addEventListener("click", entra);
   });
 });
 
+
+/* ===================== papel del alumno y revisión ===================== */
+/* Cada quien tiene una hoja en su banca. El alumno la escribe; el maestro,
+   cuando se para junto a él, la abre y le subraya lo que hay que corregir.
+   Van por dos temas aparte para no inflar el de posición, que viaja 1.4
+   veces por segundo:
+     RAIZ/doc/<docid>  lo publica el dueño de la hoja  (retenido)
+     RAIZ/mk/<docid>   lo publica el maestro           (retenido)
+   El alumno sólo se suscribe al suyo; el maestro, a todos. */
+
+var TOPE_DOC = 1200, TOPE_MARCAS = 40;
+var COLS_MK = ["corrige", "revisa", "bien"];
+
+/* el id de la hoja aguanta recargas; el de presencia (YOID) no, y así debe ser */
+var DOCID = "";
+try {
+  DOCID = localStorage.getItem("salon-docid") || "";
+  if (!/^[a-z0-9]{6,12}$/.test(DOCID)){
+    DOCID = Math.random().toString(36).slice(2, 10);
+    localStorage.setItem("salon-docid", DOCID);
+  }
+} catch(e){ DOCID = Math.random().toString(36).slice(2, 10); }
+
+var miDoc = "";
+try { miDoc = String(localStorage.getItem("salon-doc") || "").slice(0, TOPE_DOC); } catch(e){}
+var misMarcas = [], miNotaProf = "", marcasNuevas = false;
+var docs = Object.create(null);     /* docid -> {n, t, at}  — sólo lo llena el maestro */
+var marcasDe = Object.create(null); /* docid -> marcas */
+var revActivo = "";                 /* docid que el maestro trae abierto */
+
+function esc(s){
+  return String(s).replace(/[&<>"]/g, function(c){
+    return c === "&" ? "&amp;" : c === "<" ? "&lt;" : c === ">" ? "&gt;" : "&quot;"; });
+}
+
+/* Una marca guarda el texto que subrayó el maestro, no nada más las posiciones:
+   si el alumno escribe algo antes, la posición se recorre pero el texto sigue
+   ahí, y la volvemos a encontrar. Si ya lo borró o lo cambió, la marca se cae
+   sola, que es justo lo que uno esperaría. */
+function anclaMarcas(txt, marcas){
+  var out = [];
+  for (var i = 0; i < marcas.length; i++){
+    var m = marcas[i], a = m.a|0, b = m.b|0, s = String(m.s || "");
+    if (!s) continue;
+    if (txt.slice(a, b) !== s){
+      var j = txt.indexOf(s);
+      if (j < 0) continue;            /* ya no existe: se cae */
+      a = j; b = j + s.length;
+    }
+    out.push({a: a, b: b, c: Math.min(2, Math.max(0, m.c|0)), s: s});
+  }
+  out.sort(function(p, q){ return p.a - q.a || q.b - p.b; });
+  /* si dos se enciman, gana la que empieza antes y la otra se recorta */
+  var limpio = [], fin = 0;
+  for (var k = 0; k < out.length; k++){
+    var r = out[k];
+    if (r.a < fin) r = {a: fin, b: r.b, c: r.c, s: r.s};
+    if (r.b <= r.a) continue;
+    limpio.push(r); fin = r.b;
+  }
+  return limpio;
+}
+
+function pintaConMarcas(txt, marcas){
+  var res = anclaMarcas(txt, marcas), html = "", pos = 0;
+  for (var i = 0; i < res.length; i++){
+    var m = res[i];
+    html += esc(txt.slice(pos, m.a));
+    html += '<mark class="mk' + m.c + '">' + esc(txt.slice(m.a, m.b)) + "</mark>";
+    pos = m.b;
+  }
+  html += esc(txt.slice(pos));
+  /* un renglón en blanco al final para que el textarea y el fondo midan igual */
+  return html + "\n";
+}
+
+/* ---------- lado del alumno ---------- */
+var dockP  = document.getElementById("dockPapel");
+var taP    = document.getElementById("taPapel");
+var backP  = document.getElementById("papelBack");
+var avisoP = document.getElementById("avisoProf");
+var leyP   = document.getElementById("leyendaPapel");
+
+function pintaPapel(){
+  backP.innerHTML = pintaConMarcas(taP.value, misMarcas);
+  backP.scrollTop = taP.scrollTop;
+  var hay = anclaMarcas(taP.value, misMarcas).length;
+  leyP.hidden = !hay;
+  if (miNotaProf){
+    avisoP.innerHTML = "<b>El maestro te dejó una nota:</b> " + esc(miNotaProf);
+    avisoP.hidden = false;
+  } else avisoP.hidden = true;
+  document.getElementById("notaPapel").textContent =
+    taP.value.length >= TOPE_DOC ? "Llegaste al límite de la hoja."
+    : hay ? (hay === 1 ? "1 cosa marcada." : hay + " cosas marcadas.") : "";
+}
+
+function abrePapel(){
+  if (!dockP.hidden){ cierraPapel(); return; }
+  cierraRev();
+  taP.value = miDoc;
+  dockP.hidden = false;
+  marcasNuevas = false;
+  var bp0 = document.getElementById("bPapel");
+  bp0.classList.remove("alerta");
+  bp0.textContent = "Mi papel · P";
+  pintaPapel();
+  taP.focus();
+  empuja(true);
+}
+function cierraPapel(){
+  dockP.hidden = true;
+  try { taP.blur(); } catch(e){}
+}
+
+var relojD = 0, colaD = false;
+function publicaDoc(){
+  var ahora = Date.now();
+  if (ahora - relojD < 500){
+    if (!colaD){ colaD = true; setTimeout(function(){ colaD = false; publicaDoc(); }, 520); }
+    return;
+  }
+  relojD = ahora;
+  try { localStorage.setItem("salon-doc", miDoc); } catch(e){}
+  if (!cli || !conectado) return;
+  try {
+    cli.publish(RAIZ + "/doc/" + DOCID,
+      miDoc ? JSON.stringify({n: yo.nick.slice(0,14), t: miDoc, at: Date.now()}) : "",
+      {qos: 0, retain: true});
+  } catch(e){}
+}
+
+taP.addEventListener("input", function(){
+  miDoc = taP.value.slice(0, TOPE_DOC);
+  pintaPapel();
+  publicaDoc();
+  empuja(true);
+});
+taP.addEventListener("scroll", function(){ backP.scrollTop = taP.scrollTop; });
+taP.addEventListener("keydown", function(e){
+  if (e.key === "Escape"){ cierraPapel(); e.preventDefault(); }
+});
+document.getElementById("bPapelClose").addEventListener("click", cierraPapel);
+document.getElementById("bPapelBorrar").addEventListener("click", function(){
+  if (!confirm("¿Borrar todo lo que escribiste en tu papel? No se puede deshacer.")) return;
+  miDoc = ""; taP.value = ""; misMarcas = []; miNotaProf = "";
+  try { localStorage.removeItem("salon-doc"); } catch(e){}
+  if (cli && conectado){
+    try {
+      cli.publish(RAIZ + "/doc/" + DOCID, "", {qos:0, retain:true});
+      cli.publish(RAIZ + "/mk/"  + DOCID, "", {qos:0, retain:true});
+    } catch(e){}
+  }
+  pintaPapel(); empuja(true); taP.focus();
+});
+
+/* ---------- lo que llega por la red ---------- */
+function docidOk(s){ return /^[a-z0-9]{4,12}$/.test(s); }
+
+function llegaDoc(docid, txt){
+  if (!docidOk(docid)) return;
+  if (!txt){ delete docs[docid]; if (revActivo === docid) pintaRev(); return; }
+  var d = null;
+  try { d = JSON.parse(txt); } catch(e){ return; }
+  if (!d || typeof d.t !== "string") return;
+  docs[docid] = {
+    n: typeof d.n === "string" ? d.n.slice(0, 14) : "alumno",
+    t: d.t.slice(0, TOPE_DOC),
+    at: typeof d.at === "number" ? d.at : Date.now()
+  };
+  if (revActivo === docid) pintaRev();
+}
+
+function llegaMarcas(docid, txt){
+  if (!docidOk(docid)) return;
+  var lista = [], nota = "";
+  if (txt){
+    var d = null;
+    try { d = JSON.parse(txt); } catch(e){ return; }
+    if (!d || typeof d !== "object") return;
+    if (Object.prototype.toString.call(d.m) === "[object Array]"){
+      for (var i = 0; i < d.m.length && lista.length < TOPE_MARCAS; i++){
+        var m = d.m[i];
+        if (!m || typeof m.s !== "string" || !m.s) continue;
+        lista.push({a: m.a|0, b: m.b|0,
+                    c: Math.min(2, Math.max(0, m.c|0)), s: m.s.slice(0, TOPE_DOC)});
+      }
+    }
+    if (typeof d.nota === "string") nota = d.nota.slice(0, 140);
+  }
+
+  if (soyProfe){
+    marcasDe[docid] = lista;
+    marcasDe[docid + "@nota"] = nota;
+    if (revActivo === docid){
+      if (document.activeElement !== revN) revN.value = nota;
+      pintaRev();
+    }
+    return;
+  }
+
+  if (docid !== DOCID) return;
+  misMarcas = lista;
+  miNotaProf = nota;
+  var hay = lista.length + (nota ? 1 : 0);
+  var bp = document.getElementById("bPapel");
+  if (hay && dockP.hidden){
+    marcasNuevas = true;
+    bp.classList.add("alerta");
+    bp.textContent = "Tu papel · corregido";
+  } else if (!hay){
+    marcasNuevas = false;
+    bp.classList.remove("alerta");
+    bp.textContent = "Mi papel · P";
+  }
+  if (!dockP.hidden) pintaPapel();
+  empuja(true);
+}
+
+/* ---------- lado del maestro ---------- */
+var dockR = document.getElementById("dockRev");
+var revT  = document.getElementById("revTexto");
+var revN  = document.getElementById("revNota");
+
+/* de todos los que están dentro, el que tengo más cerca; los sentados ganan */
+function alumnoCerca(){
+  if (!soyProfe || !dentro) return null;
+  var mejor = null, dm = 1e9;
+  for (var i = 0; i < otros.length; i++){
+    var o = otros[i];
+    if (o.pf) continue;                       /* otro maestro no */
+    var dx = o.x - yo.x, dy = (o.y - yo.y) * 1.6;   /* el salón es ancho: pesa más lo vertical */
+    var dd = dx*dx + dy*dy;
+    if (o.sent >= 0) dd *= .55;
+    if (dd < dm){ dm = dd; mejor = o; }
+  }
+  return dm < 700 ? mejor : null;
+}
+
+function nombreDe(docid){
+  for (var i = 0; i < otros.length; i++)
+    if (otros[i].dk === docid) return otros[i].nick;
+  return (docs[docid] && docs[docid].n) || "alumno";
+}
+
+function listaAlumnos(){
+  var box = document.getElementById("listaAl");
+  var firma = revActivo + "|";
+  for (var f = 0; f < otros.length; f++)
+    if (!otros[f].pf) firma += otros[f].dk + otros[f].nick + otros[f].dl + ",";
+  if (firma === firmaLista) return;
+  firmaLista = firma;
+  box.innerHTML = "";
+  var vistos = Object.create(null), n = 0;
+  for (var i = 0; i < otros.length; i++){
+    var o = otros[i];
+    if (o.pf || !o.dk || vistos[o.dk]) continue;
+    vistos[o.dk] = 1; n++;
+    (function(dk, nick, tiene){
+      var b = document.createElement("button");
+      b.type = "button";
+      b.textContent = (tiene ? "" : "· ") + nick.slice(0, 12);
+      b.title = tiene ? "Tiene algo escrito" : "Su hoja está en blanco";
+      b.setAttribute("aria-pressed", dk === revActivo ? "true" : "false");
+      b.addEventListener("click", function(){ abreRev(dk); });
+      box.appendChild(b);
+    })(o.dk, o.nick, !!o.dl);
+  }
+  if (!n) box.innerHTML = '<span class="nota" style="margin:0">Nadie más en el salón todavía.</span>';
+}
+
+var firmaRev = "", firmaLista = "";
+
+/* si hay texto seleccionado aqui adentro, no le movemos nada */
+function haySeleccion(cont){
+  var s = window.getSelection();
+  return !!(s && s.rangeCount && !s.isCollapsed &&
+            cont.contains(s.getRangeAt(0).commonAncestorContainer));
+}
+
+function pintaRev(forzar){
+  if (!revActivo) return;
+  var d = docs[revActivo], txt = d ? d.t : "";
+  var marcas = marcasDe[revActivo] || [];
+  var firma = revActivo + "|" + txt + "|" + JSON.stringify(marcas);
+
+  if (forzar || firma !== firmaRev){
+    if (!(haySeleccion(revT) && !forzar)){
+      document.getElementById("tituloRev").textContent =
+        "Revisando a " + nombreDe(revActivo).toUpperCase();
+      if (!txt){
+        revT.className = "papel-cap vacio";
+        revT.textContent = "Todavía no ha escrito nada en su papel.";
+      } else {
+        revT.className = "papel-cap";
+        revT.innerHTML = pintaConMarcas(txt, marcas);
+      }
+      document.getElementById("notaRev").textContent =
+        marcas.length ? (marcas.length === 1 ? "1 marca puesta." : marcas.length + " marcas puestas.")
+                      : "Selecciona una palabra o frase y ponle color.";
+      firmaRev = firma;
+    }
+  }
+  listaAlumnos();
+}
+
+function abreRev(docid){
+  if (!soyProfe) return;
+  if (!dockR.hidden && revActivo === docid){ cierraRev(); return; }
+  cierraPapel();
+  revActivo = docid;
+  dockR.hidden = false;
+  revN.value = (marcasDe[docid + "@nota"] || "");
+  firmaRev = ""; firmaLista = "";
+  if (cli && conectado){
+    try { cli.subscribe(RAIZ + "/doc/" + docid, {qos:0}); } catch(e){}
+  }
+  pintaRev(true);
+}
+function cierraRev(){
+  dockR.hidden = true;
+  revActivo = "";
+  document.getElementById("bRevisar").classList.remove("on");
+}
+
+/* dónde empieza y dónde acaba lo que el maestro seleccionó, contado sobre el
+   texto pelón — el div trae <mark> adentro, así que hay que recorrer los nodos */
+function offsetsSeleccion(cont){
+  var sel = window.getSelection();
+  if (!sel || sel.rangeCount === 0 || sel.isCollapsed) return null;
+  var r = sel.getRangeAt(0);
+  if (!cont.contains(r.startContainer) || !cont.contains(r.endContainer)) return null;
+  var w = document.createTreeWalker(cont, NodeFilter.SHOW_TEXT, null, false);
+  var pos = 0, a = -1, b = -1, nodo;
+  while ((nodo = w.nextNode())){
+    if (nodo === r.startContainer) a = pos + r.startOffset;
+    if (nodo === r.endContainer)   b = pos + r.endOffset;
+    pos += nodo.nodeValue.length;
+  }
+  if (a < 0 || b < 0 || b <= a) return null;
+  return {a: a, b: b};
+}
+
+function marca(color){
+  if (!revActivo) return;
+  var d = docs[revActivo];
+  if (!d || !d.t){ document.getElementById("notaRev").textContent = "No hay nada que marcar."; return; }
+  var o = offsetsSeleccion(revT);
+  if (!o){
+    document.getElementById("notaRev").textContent =
+      "Primero selecciona con el mouse la palabra o la frase.";
+    return;
+  }
+  var lista = marcasDe[revActivo] || [];
+  if (lista.length >= TOPE_MARCAS){
+    document.getElementById("notaRev").textContent = "Ya son muchas marcas en esta hoja.";
+    return;
+  }
+  /* si vuelve a marcar encima de algo, se reemplaza en vez de encimarse */
+  lista = lista.filter(function(m){ return m.b <= o.a || m.a >= o.b; });
+  lista.push({a: o.a, b: o.b, c: color, s: d.t.slice(o.a, o.b)});
+  marcasDe[revActivo] = lista;
+  try { window.getSelection().removeAllRanges(); } catch(e){}
+  publicaMarcas(revActivo);
+  pintaRev(true);
+}
+
+function publicaMarcas(docid){
+  if (!cli || !conectado) return;
+  var lista = marcasDe[docid] || [], nota = marcasDe[docid + "@nota"] || "";
+  try {
+    cli.publish(RAIZ + "/mk/" + docid,
+      (lista.length || nota)
+        ? JSON.stringify({m: lista.slice(0, TOPE_MARCAS), nota: nota.slice(0, 140),
+                          by: yo.nick.slice(0,14), at: Date.now()})
+        : "",
+      {qos: 0, retain: true});
+  } catch(e){}
+}
+
+document.getElementById("bMk0").addEventListener("click", function(){ marca(0); });
+document.getElementById("bMk1").addEventListener("click", function(){ marca(1); });
+document.getElementById("bMk2").addEventListener("click", function(){ marca(2); });
+document.getElementById("bMkUndo").addEventListener("click", function(){
+  if (!revActivo) return;
+  var l = marcasDe[revActivo] || [];
+  l.pop(); marcasDe[revActivo] = l;
+  publicaMarcas(revActivo); pintaRev(true);
+});
+document.getElementById("bMkClear").addEventListener("click", function(){
+  if (!revActivo) return;
+  marcasDe[revActivo] = []; marcasDe[revActivo + "@nota"] = ""; revN.value = "";
+  publicaMarcas(revActivo); pintaRev(true);
+});
+document.getElementById("bRevClose").addEventListener("click", cierraRev);
+revN.addEventListener("input", function(){
+  if (!revActivo) return;
+  marcasDe[revActivo + "@nota"] = revN.value.slice(0, 140);
+});
+revN.addEventListener("change", function(){ if (revActivo) publicaMarcas(revActivo); });
+revN.addEventListener("keydown", function(e){
+  if (e.key === "Enter"){ if (revActivo) publicaMarcas(revActivo); revN.blur(); e.preventDefault(); }
+  if (e.key === "Escape"){ cierraRev(); e.preventDefault(); }
+});
+
+document.getElementById("bPapel").addEventListener("click", abrePapel);
+document.getElementById("bRevisar").addEventListener("click", function(){
+  var o = alumnoCerca();
+  if (o && o.dk) abreRev(o.dk);
+  else if (!dockR.hidden) cierraRev();
+});
+
+/* el botón de revisar se prende solo cuando hay alguien al lado */
+setInterval(function(){
+  if (!soyProfe || !dentro) return;
+  var o = alumnoCerca(), b = document.getElementById("bRevisar");
+  if (o){
+    b.disabled = false;
+    b.classList.add("cerca");
+    b.textContent = "Revisar a " + o.nick.slice(0, 10) + " · R";
+  } else {
+    b.disabled = dockR.hidden;
+    b.classList.remove("cerca");
+    b.textContent = "Revisar · R";
+  }
+  if (!dockR.hidden && revActivo) pintaRev();
+}, 400);
+
 ajusta();
 requestAnimationFrame(paso);
 })();
 </script>
+
+<!-- ---------- papel del alumno ---------- -->
+<div id="dockPapel" hidden>
+  <div class="dock-t" id="tituloPapel">Tu papel — lo ve el maestro cuando se acerca</div>
+  <div class="papel-caja">
+    <div id="papelBack" aria-hidden="true" class="papel-cap"></div>
+    <textarea id="taPapel" class="papel-cap" maxlength="1200" spellcheck="true"
+      placeholder="Escribe aquí tu trabajo de clase…"></textarea>
+  </div>
+  <div class="aviso-prof" id="avisoProf" hidden></div>
+  <div class="leyenda" id="leyendaPapel" hidden>
+    Lo que marcó el maestro: <i class="l0">corrige</i> <i class="l1">revisa</i> <i class="l2">bien</i>
+  </div>
+  <div class="dock-b">
+    <span class="nota" id="notaPapel" style="margin:0"></span>
+    <button class="b" id="bPapelBorrar" type="button">Borrar mi papel</button>
+    <button class="b" id="bPapelClose" type="button">Cerrar · Esc</button>
+  </div>
+</div>
+
+<!-- ---------- revisión del maestro ---------- -->
+<div id="dockRev" hidden>
+  <div class="dock-t" id="tituloRev">Revisando</div>
+  <div class="lista-al" id="listaAl"></div>
+  <div id="revTexto" class="papel-cap"></div>
+  <div class="leyenda">
+    Selecciona con el mouse y marca: <i class="l0">corrige</i> <i class="l1">revisa</i> <i class="l2">bien</i>
+  </div>
+  <input id="revNota" type="text" maxlength="140" autocomplete="off"
+    placeholder="Nota corta para el alumno (opcional)">
+  <div class="dock-b">
+    <button class="b mk0" id="bMk0" type="button">Corrige</button>
+    <button class="b mk1" id="bMk1" type="button">Revisa</button>
+    <button class="b mk2" id="bMk2" type="button">Bien</button>
+    <button class="b" id="bMkUndo" type="button">Quitar última</button>
+    <button class="b" id="bMkClear" type="button">Limpiar marcas</button>
+    <button class="b" id="bRevClose" type="button">Cerrar · Esc</button>
+  </div>
+  <div class="dock-b">
+    <span class="nota" id="notaRev" style="margin:0"></span>
+  </div>
+</div>
+
 </body>
 </html>
