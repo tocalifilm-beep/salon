@@ -567,7 +567,8 @@ function pinta(){
   var todos = otros.slice();
   if (dentro) todos.push({me:true, a:yo, nick: yo.nick || "tú", x:yo.x, y:yo.y,
                           sent:yo.sent, say:yo.say, re:yo.re, pf:soyProfe,
-                          dk: DOCID, dl: miDoc.length ? 1 : 0, dm: marcasNuevas ? 1 : 0});
+                          dk: DOCID, dl: (miDoc.length && !soyProfe) ? 1 : 0,
+                          dm: marcasNuevas ? 1 : 0});
   todos.sort(function(A, B){ return A.y - B.y; });
 
   for (var i = 0; i < todos.length; i++){
@@ -762,7 +763,7 @@ function conecta(cb){
       if (soyProfe) temas.push(RAIZ + "/doc/+", RAIZ + "/mk/+");
       else temas.push(RAIZ + "/mk/" + DOCID);
       c.subscribe(temas, {qos: 0});
-      if (miDoc) setTimeout(publicaDoc, 400);
+      if (miDoc && !soyProfe) setTimeout(publicaDoc, 400);
       nota("<b>Conectado.</b> Salón <b>" + norm(cfg.sala) + "</b>.");
       cb(true);
     });
@@ -850,7 +851,8 @@ function empuja(force){
   var d = {n: yo.nick.slice(0,14), p:yo.p, h:yo.h, r:yo.r, c:yo.c, g:yo.g,
            x: Math.round(yo.x*10)/10, y: Math.round(yo.y*10)/10,
            s: yo.sent, f: soyProfe ? 1 : 0,
-           dk: DOCID, dl: miDoc.length ? 1 : 0, dm: marcasNuevas ? 1 : 0};
+           dk: DOCID, dl: (miDoc.length && !soyProfe) ? 1 : 0,
+           dm: marcasNuevas ? 1 : 0};
   if (yo.say && ahora - yo.say.at < 7000) d.say = {t: yo.say.t, d: ahora - yo.say.at};
   if (yo.re && ahora - yo.re.at < 2600) d.re = {k: yo.re.k, d: ahora - yo.re.at};
   try { cli.publish(RAIZ + "/p/" + YOID, JSON.stringify(d), {qos:0, retain:false}); } catch(e){}
@@ -1232,6 +1234,7 @@ function publicaDoc(){
     return;
   }
   relojD = ahora;
+  if (soyProfe) return;
   try { localStorage.setItem("salon-doc", miDoc); } catch(e){}
   if (!cli || !conectado) return;
   try {
