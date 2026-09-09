@@ -1139,6 +1139,7 @@ var misMarcas = [], miNotaProf = "", marcasNuevas = false;
 var docs = Object.create(null);     /* docid -> {n, t, at}  — sólo lo llena el maestro */
 var marcasDe = Object.create(null); /* docid -> marcas */
 var revActivo = "";                 /* docid que el maestro trae abierto */
+var miUltimaMarca = Object.create(null);  /* docid -> hora de lo ultimo que publique */
 
 function esc(s){
   return String(s).replace(/[&<>"]/g, function(c){
@@ -1286,9 +1287,8 @@ function llegaDoc(docid, txt){
 
 function llegaMarcas(docid, txt){
   if (!docidOk(docid)) return;
-  var lista = [], nota = "";
+  var lista = [], nota = "", d = null;
   if (txt){
-    var d = null;
     try { d = JSON.parse(txt); } catch(e){ return; }
     if (!d || typeof d !== "object") return;
     if (Object.prototype.toString.call(d.m) === "[object Array]"){
@@ -1303,6 +1303,10 @@ function llegaMarcas(docid, txt){
   }
 
   if (soyProfe){
+    /* si esto es el eco de algo que yo mismo mande, y ya mande algo mas nuevo,
+       no me lo dejo pisar */
+    var mio = miUltimaMarca[docid];
+    if (mio && (!d || typeof d.at !== "number" || d.at < mio)) return;
     marcasDe[docid] = lista;
     marcasDe[docid + "@nota"] = nota;
     if (revActivo === docid){
@@ -1481,11 +1485,13 @@ function marca(color){
 function publicaMarcas(docid){
   if (!cli || !conectado) return;
   var lista = marcasDe[docid] || [], nota = marcasDe[docid + "@nota"] || "";
+  var at = Date.now();
+  miUltimaMarca[docid] = at;
   try {
     cli.publish(RAIZ + "/mk/" + docid,
       (lista.length || nota)
         ? JSON.stringify({m: lista.slice(0, TOPE_MARCAS), nota: nota.slice(0, 140),
-                          by: yo.nick.slice(0,14), at: Date.now()})
+                          by: yo.nick.slice(0,14), at: at})
         : "",
       {qos: 0, retain: true});
   } catch(e){}
@@ -1506,13 +1512,29 @@ document.getElementById("bMkClear").addEventListener("click", function(){
   publicaMarcas(revActivo); pintaRev(true);
 });
 document.getElementById("bRevClose").addEventListener("click", cierraRev);
+var relojN = 0, colaN = false;
+function mandaNota(){
+  if (!revActivo) return;
+  var ahora = Date.now();
+  if (ahora - relojN < 500){
+    if (!colaN){ colaN = true; setTimeout(function(){ colaN = false; mandaNota(); }, 520); }
+    return;
+  }
+  relojN = ahora;
+  publicaMarcas(revActivo);
+}
 revN.addEventListener("input", function(){
   if (!revActivo) return;
   marcasDe[revActivo + "@nota"] = revN.value.slice(0, 140);
+  mandaNota();
 });
-revN.addEventListener("change", function(){ if (revActivo) publicaMarcas(revActivo); });
+revN.addEventListener("change", function(){
+  if (!revActivo) return;
+  marcasDe[revActivo + "@nota"] = revN.value.slice(0, 140);
+  publicaMarcas(revActivo);
+});
 revN.addEventListener("keydown", function(e){
-  if (e.key === "Enter"){ if (revActivo) publicaMarcas(revActivo); revN.blur(); e.preventDefault(); }
+  if (e.key === "Enter"){ revN.blur(); e.preventDefault(); }
   if (e.key === "Escape"){ cierraRev(); e.preventDefault(); }
 });
 
